@@ -1,0 +1,441 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz de Matrizes - Companion 3D Tic-Tac-Toe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #7F53AC 0%, #647DEE 100%);
+      min-height: 100vh;
+      color: #2D3748;
+    }
+    .font-heading {
+      font-family: 'Fredoka One', cursive;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border: 3px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+    .btn-bounce {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn-bounce:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    .btn-bounce:active:not(:disabled) {
+      transform: translateY(1px) scale(0.98);
+    }
+    .matrix-code {
+      font-family: 'Fredoka One', monospace;
+      letter-spacing: 0.05em;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(127, 83, 172, 0.5);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center justify-between">
+
+  <!-- Header Header -->
+  <header class="w-full max-w-3xl text-center my-2">
+    <div class="inline-block bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-white text-xs font-bold tracking-widest uppercase mb-1 shadow-sm">
+      🎲 Acompanhante para Tabuleiro Físico
+    </div>
+    <h1 class="text-3xl sm:text-5xl font-heading text-white drop-shadow-lg tracking-wide">
+      Quiz de Matrizes 3D
+    </h1>
+  </header>
+
+  <!-- Player Status & Global Controls -->
+  <div class="w-full max-w-3xl glass-card rounded-3xl p-4 my-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+    
+    <!-- Player 1 Score -->
+    <div id="p1-card" class="w-full sm:w-auto flex-1 flex items-center justify-between sm:justify-start gap-3 px-4 py-2.5 rounded-2xl border-4 transition-all" style="background-color: #FFF0F0; border-color: #FF6B6B;">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">❌</span>
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-red-500">Jogador 1</div>
+          <div class="font-heading text-lg text-slate-800">Coral</div>
+        </div>
+      </div>
+      <div class="bg-red-500 text-white font-heading text-xl px-3 py-1 rounded-xl min-w-[45px] text-center shadow">
+        <span id="score-p1">0</span>
+      </div>
+    </div>
+
+    <!-- Active Turn Badge -->
+    <div id="turn-badge" class="px-5 py-2.5 rounded-2xl font-heading text-center text-sm sm:text-base text-white shadow-lg animate-pulse w-full sm:w-auto shrink-0" style="background-color: #FF6B6B;">
+      Vez do Jogador 1 (❌)
+    </div>
+
+    <!-- Player 2 Score -->
+    <div id="p2-card" class="w-full sm:w-auto flex-1 flex items-center justify-between sm:justify-end gap-3 px-4 py-2.5 rounded-2xl border-4 transition-all opacity-60" style="background-color: #E8FCFA; border-color: #4ECDC4;">
+      <div class="bg-teal-500 text-white font-heading text-xl px-3 py-1 rounded-xl min-w-[45px] text-center shadow order-1 sm:order-none">
+        <span id="score-p2">0</span>
+      </div>
+      <div class="flex items-center gap-2 text-right">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-teal-600">Jogador 2</div>
+          <div class="font-heading text-lg text-slate-800">Turquesa</div>
+        </div>
+        <span class="text-2xl">⭕</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Question Selector Screen -->
+  <main class="w-full max-w-3xl glass-card rounded-3xl p-5 sm:p-7 my-2 flex-grow flex flex-col justify-between gap-5">
+    
+    <!-- Top Action Bar -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b-2 border-purple-100 pb-4">
+      <div>
+        <h2 class="font-heading text-xl sm:text-2xl text-purple-900 flex items-center gap-2">
+          🎯 Selecione uma Pergunta
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 font-semibold">
+          Responda corretamente para liberar sua jogada no jogo físico!
+        </p>
+      </div>
+
+      <button onclick="pickRandomQuestion()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-amber-950 font-heading text-sm px-5 py-2.5 rounded-2xl border-2 border-amber-300 shadow-md btn-bounce flex items-center justify-center gap-2">
+        <span>🎲</span> Pergunta Aleatória
+      </button>
+    </div>
+
+    <!-- Questions Grid (1 to 30) -->
+    <div id="question-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-2.5 sm:gap-3 py-2">
+      <!-- Generated via JS -->
+    </div>
+
+    <!-- Instructions Banner -->
+    <div class="bg-purple-50/80 border-2 border-purple-200 rounded-2xl p-3.5 text-xs sm:text-sm text-purple-900 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">💡</span>
+        <span><b>Como Jogar:</b> Escolha uma pergunta numerada. Acerte para ganhar o direito de colocar sua peça no tabuleiro físico 3D!</span>
+      </div>
+      <button onclick="resetGameModal()" class="text-xs font-bold text-purple-600 hover:underline shrink-0">
+        Reiniciar
+      </button>
+    </div>
+  </main>
+
+  <!-- Sticky Physical Victory Trigger -->
+  <div class="w-full max-w-3xl my-3">
+    <button onclick="triggerPhysicalVictoryPrompt()" class="w-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-500 hover:to-teal-600 text-white font-heading text-lg sm:text-2xl py-4 px-6 rounded-3xl border-4 border-white shadow-2xl btn-bounce flex items-center justify-center gap-3">
+      <span>🏆</span> Ganhei no Tabuleiro Físico! 🎉
+    </button>
+  </div>
+
+  <!-- MODAL: PASS THE DEVICE (PASSAR O DISPOSITIVO) -->
+  <div id="pass-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 animate-bounce-in border-4 border-purple-300">
+      <div id="pass-avatar" class="text-6xl animate-pulse">📲</div>
+      <h2 id="pass-title" class="font-heading text-2xl sm:text-3xl text-purple-900">Passe o Dispositivo!</h2>
+      <p id="pass-desc" class="text-sm sm:text-base font-bold text-slate-700">
+        Passe o celular/tablet para o <span id="pass-player-name" class="underline">Jogador 2</span> para iniciar a próxima jogada.
+      </p>
+      <button onclick="confirmPassDevice()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-heading text-lg py-3.5 rounded-2xl shadow-xl btn-bounce border-2 border-indigo-300 mt-2">
+        👍 Estou Pronto! Começar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: QUIZ QUESTION -->
+  <div id="quiz-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-xl w-full p-5 sm:p-7 flex flex-col gap-4 relative border-4 border-white shadow-2xl">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <div class="flex items-center gap-2">
+          <span id="quiz-player-badge" class="font-heading text-xs px-3 py-1 rounded-full text-white shadow">
+            Vez de P1
+          </span>
+          <span id="quiz-title" class="font-heading text-lg sm:text-xl text-purple-900">Pergunta #1</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <div class="bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-full text-xs border border-amber-300">
+            Chances: <span id="quiz-attempts">2/2</span>
+          </div>
+          <div id="quiz-timer" class="bg-red-500 text-white font-heading px-3 py-1 rounded-full text-sm animate-pulse shadow">
+            45s
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer Progress Bar -->
+      <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+        <div id="timer-bar" class="bg-red-500 h-full transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+      </div>
+
+      <!-- Question Text -->
+      <div id="quiz-text" class="text-base sm:text-lg font-extrabold text-slate-800 my-1 leading-relaxed">
+        Carregando Pergunta...
+      </div>
+
+      <!-- Options -->
+      <div id="quiz-options" class="flex flex-col gap-2.5">
+        <!-- Generated JS options -->
+      </div>
+
+      <!-- Toast / Feedback Message -->
+      <div id="quiz-feedback" class="hidden p-3 rounded-2xl font-bold text-center text-sm shadow"></div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: SUCCESS ACTION PROMPT (FOR PHYSICAL BOARD) -->
+  <div id="action-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 border-4 border-emerald-400 shadow-2xl">
+      <div class="text-6xl animate-bounce">🎯</div>
+      <h2 class="font-heading text-2xl sm:text-3xl text-emerald-600">Resposta Correta!</h2>
+      <p class="text-base font-extrabold text-slate-800 bg-emerald-50 p-4 rounded-2xl border-2 border-emerald-200">
+        "Sua resposta está correta! Você pode colocar sua peça no tabuleiro físico!"
+      </p>
+      <button onclick="finishCorrectTurn()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-heading text-lg py-3.5 rounded-2xl shadow-xl btn-bounce border-2 border-emerald-300">
+        ✅ Peça Colocada! Próximo Turno
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: PHYSICAL VICTORY DECLARATION -->
+  <div id="victory-modal" class="fixed inset-0 bg-slate-900/85 backdrop-blur-lg hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 border-4 border-amber-400 shadow-2xl">
+      <div class="text-7xl animate-bounce">🏆</div>
+      <h2 class="font-heading text-3xl sm:text-4xl text-purple-900">Vitória no Tabuleiro!</h2>
+      <p class="text-sm sm:text-base font-bold text-slate-600">
+        Quem foi o grande vencedor da partida no tabuleiro físico 3D?
+      </p>
+
+      <div class="grid grid-cols-2 gap-3 w-full my-2">
+        <button onclick="declareWinner(1)" class="p-4 rounded-2xl border-4 text-slate-800 font-heading text-lg btn-bounce flex flex-col items-center gap-1" style="background-color: #FFF0F0; border-color: #FF6B6B;">
+          <span class="text-3xl">❌</span>
+          <span>Jogador 1 (Coral)</span>
+        </button>
+        <button onclick="declareWinner(2)" class="p-4 rounded-2xl border-4 text-slate-800 font-heading text-lg btn-bounce flex flex-col items-center gap-1" style="background-color: #E8FCFA; border-color: #4ECDC4;">
+          <span class="text-3xl">⭕</span>
+          <span>Jogador 2 (Turquesa)</span>
+        </button>
+      </div>
+
+      <button onclick="closeVictoryModal()" class="text-xs font-bold text-slate-500 hover:underline">
+        Cancelar / Continuar Jogando
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: FINAL SUMMARY SCREEN -->
+  <div id="summary-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-xl hidden flex items-center justify-center p-4 z-50">
+    <div class="glass-card rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 border-4 border-amber-300 shadow-2xl">
+      <div class="text-6xl">👑</div>
+      <h2 id="summary-title" class="font-heading text-3xl sm:text-4xl text-amber-500">Parabéns Jogador!</h2>
+      <p id="summary-subtitle" class="text-base font-bold text-slate-700">Você dominou o Quiz de Matrizes e o Tabuleiro 3D!</p>
+      
+      <!-- Stats Box -->
+      <div class="w-full bg-purple-50 rounded-2xl p-4 border-2 border-purple-200 text-left space-y-2 text-sm sm:text-base font-bold text-slate-700 my-1">
+        <div class="flex justify-between border-b pb-1">
+          <span>Pontos Jogador 1 (Coral):</span>
+          <span id="summary-p1-score" class="text-red-500 font-heading">0</span>
+        </div>
+        <div class="flex justify-between border-b pb-1">
+          <span>Pontos Jogador 2 (Turquesa):</span>
+          <span id="summary-p2-score" class="text-teal-500 font-heading">0</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Perguntas Respondidas:</span>
+          <span id="summary-total-questions" class="text-purple-700 font-heading">0 / 30</span>
+        </div>
+      </div>
+
+      <button onclick="resetGameModal()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-heading text-lg py-3.5 rounded-2xl shadow-xl btn-bounce border-2 border-purple-300 mt-2">
+        🔄 Iniciar Nova Partida
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. REVISED MATRICES QUESTIONS (PLAIN READABLE TEXT)
+       ========================================================================= */
+    const questions = [
+      {
+        id: 1,
+        question: "O que é uma matriz de ordem 2x3?",
+        options: [
+          "2 linhas e 3 colunas",
+          "3 linhas e 2 colunas",
+          "2 linhas e 2 colunas",
+          "3 linhas e 3 colunas"
+        ],
+        correct: 0,
+        explanation: "A ordem informa primeiro o número de linhas (2) e depois de colunas (3)."
+      },
+      {
+        id: 2,
+        question: "Dada a matriz A = [ 2, 5 ; -1, 3 ], onde a primeira linha é (2, 5) e a segunda linha é (-1, 3), qual é o elemento da segunda linha e primeira coluna (a21)?",
+        options: ["2", "5", "-1", "3"],
+        correct: 2,
+        explanation: "O elemento a21 fica na 2ª linha e 1ª coluna, que é o -1."
+      },
+      {
+        id: 3,
+        question: "Qual é a matriz A de ordem 2x2 onde cada elemento é a soma da sua linha com sua coluna (a_ij = i + j)?",
+        options: [
+          "[ 1, 2 ; 2, 3 ]",
+          "[ 2, 3 ; 3, 4 ]",
+          "[ 1, 1 ; 2, 2 ]",
+          "[ 2, 2 ; 3, 3 ]"
+        ],
+        correct: 1,
+        explanation: "a11=1+1=2, a12=1+2=3, a21=2+1=3 e a22=2+2=4."
+      },
+      {
+        id: 4,
+        question: "O que caracteriza uma matriz quadrada?",
+        options: [
+          "O número de linhas é diferente do de colunas",
+          "O número de linhas é igual ao de colunas",
+          "Todos os elementos são iguais a 1",
+          "Todos os elementos são positivos"
+        ],
+        correct: 1,
+        explanation: "Matrizes quadradas possuem o mesmo número de linhas e colunas."
+      },
+      {
+        id: 5,
+        question: "Se uma matriz A tem ordem 2x3, qual será a ordem da sua matriz transposta?",
+        options: ["2x3", "3x2", "2x2", "3x3"],
+        correct: 1,
+        explanation: "A transposição troca linhas por colunas, transformando 2x3 em 3x2."
+      },
+      {
+        id: 6,
+        question: "Se uma matriz possui 3 linhas e 4 colunas (ordem 3x4), qual é o seu número total de elementos?",
+        options: ["7", "10", "12", "16"],
+        correct: 2,
+        explanation: "O número total de elementos é obtido multiplicando 3 x 4 = 12."
+      },
+      {
+        id: 7,
+        question: "Como é chamada uma matriz em que todos os seus elementos são iguais a zero?",
+        options: ["Matriz Identidade", "Matriz Nula", "Matriz Diagonal", "Matriz Transposta"],
+        correct: 1,
+        explanation: "Matriz nula é aquela que contém zero em todas as suas posições."
+      },
+      {
+        id: 8,
+        question: "O que é uma matriz diagonal?",
+        options: [
+          "Uma matriz em que todos os elementos são iguais",
+          "Uma matriz quadrada onde todos os elementos fora da diagonal principal são zeros",
+          "Uma matriz com apenas uma linha",
+          "Uma matriz retangular"
+        ],
+        correct: 1,
+        explanation: "Na matriz diagonal, somente os elementos da diagonal principal podem ser não nulos."
+      },
+      {
+        id: 9,
+        question: "Qual é a matriz identidade de ordem 3?",
+        options: [
+          "Uma matriz com todos os elementos iguais a 1",
+          "Uma matriz quadrada com número 1 na diagonal principal e zero nos demais elementos",
+          "Uma matriz nula de ordem 3",
+          "Uma matriz com apenas 3 elementos"
+        ],
+        correct: 1,
+        explanation: "A matriz identidade possui 1s na diagonal principal e 0s no restante."
+      },
+      {
+        id: 10,
+        question: "Qual é a condição obrigatória para podermos somar duas matrizes?",
+        options: [
+          "Elas devem ter exatamente a mesma ordem (mesmo número de linhas e colunas)",
+          "Devem ser matrizes quadradas",
+          "Devem ter ordem diferente",
+          "Devem ser matrizes nulas"
+        ],
+        correct: 0,
+        explanation: "A soma elemento a elemento exige que ambas tenham dimensões idênticas."
+      },
+      {
+        id: 11,
+        question: "Dadas as matrizes A = [ 1, 2 ; 3, 4 ] e B = [ 5, 6 ; 7, 8 ], qual é o resultado da soma A + B?",
+        options: [
+          "[ 6, 8 ; 10, 12 ]",
+          "[ 5, 8 ; 10, 12 ]",
+          "[ 6, 8 ; 9, 12 ]",
+          "[ 6, 7 ; 10, 12 ]"
+        ],
+        correct: 0,
+        explanation: "Somando posição a posição: 1+5=6, 2+6=8, 3+7=10, 4+8=12."
+      },
+      {
+        id: 12,
+        question: "Dada a matriz A = [ 2, -1 ; 3, 4 ], qual é o resultado de multiplicar todos os seus elementos por 3 (matriz 3A)?",
+        options: [
+          "[ 6, -1 ; 3, 4 ]",
+          "[ 6, -3 ; 9, 12 ]",
+          "[ 5, -3 ; 6, 7 ]",
+          "[ 6, -3 ; 3, 4 ]"
+        ],
+        correct: 1,
+        explanation: "Cada número é multiplicado por 3: 2x3=6, -1x3=-3, 3x3=9, 4x3=12."
+      },
+      {
+        id: 13,
+        question: "Qual é o determinante da matriz 2x2 A = [ 2, 3 ; 1, 4 ]? (Dica: diagonal principal menos diagonal secundária)",
+        options: ["5", "8", "11", "14"],
+        correct: 0,
+        explanation: "Det = (2 * 4) - (3 * 1) = 8 - 3 = 5."
+      },
+      {
+        id: 14,
+        question: "Qual é o resultado da multiplicação da matriz linha [ 1, 2 ] pela matriz coluna [ 3 ; 4 ]?",
+        options: ["[ 11 ]", "[ 3, 8 ]", "[ 7 ]", "[ 5 ]"],
+        correct: 0,
+        explanation: "Multiplica-se (1 * 3) + (2 * 4) = 3 + 8 = 11."
+      },
+      {
+        id: 15,
+        question: "Dada a matriz diagonal M = [ 5, 0 ; 0, -2 ], qual é o seu determinante?",
+        options: ["3", "-3", "-10", "10"],
+        correct: 2,
+        explanation: "Nas matrizes diagonais, o determinante é o produto da diagonal principal: 5 * (-2) = -10."
+      },
+      {
+        id: 16,
+        question: "Determine o valor de x para que a matriz [ x, 2 ; 3, 4 ] seja igual à matriz [ 5, 2 ; 3, 4 ].",
+        options: ["x = 2", "x = 3", "x = 4", "x = 5"],
+        correct: 3,
+        explanation: "Pela igualdade de matrizes, o elemento da 1ª linha e 1ª coluna deve ser x = 5."
+      },
+      {
+        id: 17,
+        question: "Qual é a condição para que uma matriz quadrada tenha matriz inversa?",
+        options: [
+          "O seu determinante deve ser igual a zero",
+          "O seu determinante deve ser diferente de zero",
+          "A ordem deve ser ímpar",
+          "Todos os elementos devem ser positivos"
+        ],
+        correct: 1,
+     
