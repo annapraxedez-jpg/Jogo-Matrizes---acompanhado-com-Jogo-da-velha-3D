@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -34,10 +33,6 @@
     .btn-bounce:active:not(:disabled) {
       transform: translateY(1px) scale(0.98);
     }
-    .matrix-code {
-      font-family: 'Fredoka One', monospace;
-      letter-spacing: 0.05em;
-    }
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 8px;
@@ -54,7 +49,7 @@
 </head>
 <body class="p-3 sm:p-6 min-h-screen flex flex-col items-center justify-between">
 
-  <!-- Header Header -->
+  <!-- Header -->
   <header class="w-full max-w-3xl text-center my-2">
     <div class="inline-block bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-white text-xs font-bold tracking-widest uppercase mb-1 shadow-sm">
       🎲 Acompanhante para Tabuleiro Físico
@@ -121,7 +116,7 @@
     </div>
 
     <!-- Questions Grid (1 to 30) -->
-    <div id="question-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-2.5 sm:gap-3 py-2">
+    <div id="question-grid" class="grid grid-cols-5 sm:grid-cols-6 gap-2.5 sm:gap-3 py-2 max-h-[350px] overflow-y-auto pr-1">
       <!-- Generated via JS -->
     </div>
 
@@ -144,9 +139,9 @@
     </button>
   </div>
 
-  <!-- MODAL: PASS THE DEVICE (PASSAR O DISPOSITIVO) -->
+  <!-- MODAL: PASS THE DEVICE -->
   <div id="pass-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-    <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 animate-bounce-in border-4 border-purple-300">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 border-4 border-purple-300">
       <div id="pass-avatar" class="text-6xl animate-pulse">📲</div>
       <h2 id="pass-title" class="font-heading text-2xl sm:text-3xl text-purple-900">Passe o Dispositivo!</h2>
       <p id="pass-desc" class="text-sm sm:text-base font-bold text-slate-700">
@@ -202,7 +197,7 @@
     </div>
   </div>
 
-  <!-- MODAL: SUCCESS ACTION PROMPT (FOR PHYSICAL BOARD) -->
+  <!-- MODAL: SUCCESS ACTION PROMPT -->
   <div id="action-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
     <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-8 text-center flex flex-col items-center gap-4 border-4 border-emerald-400 shadow-2xl">
       <div class="text-6xl animate-bounce">🎯</div>
@@ -273,169 +268,338 @@
 
   <script>
     /* =========================================================================
-       1. REVISED MATRICES QUESTIONS (PLAIN READABLE TEXT)
+       30 MATRICES QUESTIONS (COMPLETE & VERIFIED)
        ========================================================================= */
     const questions = [
-      {
-        id: 1,
-        question: "O que é uma matriz de ordem 2x3?",
-        options: [
-          "2 linhas e 3 colunas",
-          "3 linhas e 2 colunas",
-          "2 linhas e 2 colunas",
-          "3 linhas e 3 colunas"
-        ],
-        correct: 0,
-        explanation: "A ordem informa primeiro o número de linhas (2) e depois de colunas (3)."
-      },
-      {
-        id: 2,
-        question: "Dada a matriz A = [ 2, 5 ; -1, 3 ], onde a primeira linha é (2, 5) e a segunda linha é (-1, 3), qual é o elemento da segunda linha e primeira coluna (a21)?",
-        options: ["2", "5", "-1", "3"],
-        correct: 2,
-        explanation: "O elemento a21 fica na 2ª linha e 1ª coluna, que é o -1."
-      },
-      {
-        id: 3,
-        question: "Qual é a matriz A de ordem 2x2 onde cada elemento é a soma da sua linha com sua coluna (a_ij = i + j)?",
-        options: [
-          "[ 1, 2 ; 2, 3 ]",
-          "[ 2, 3 ; 3, 4 ]",
-          "[ 1, 1 ; 2, 2 ]",
-          "[ 2, 2 ; 3, 3 ]"
-        ],
-        correct: 1,
-        explanation: "a11=1+1=2, a12=1+2=3, a21=2+1=3 e a22=2+2=4."
-      },
-      {
-        id: 4,
-        question: "O que caracteriza uma matriz quadrada?",
-        options: [
-          "O número de linhas é diferente do de colunas",
-          "O número de linhas é igual ao de colunas",
-          "Todos os elementos são iguais a 1",
-          "Todos os elementos são positivos"
-        ],
-        correct: 1,
-        explanation: "Matrizes quadradas possuem o mesmo número de linhas e colunas."
-      },
-      {
-        id: 5,
-        question: "Se uma matriz A tem ordem 2x3, qual será a ordem da sua matriz transposta?",
-        options: ["2x3", "3x2", "2x2", "3x3"],
-        correct: 1,
-        explanation: "A transposição troca linhas por colunas, transformando 2x3 em 3x2."
-      },
-      {
-        id: 6,
-        question: "Se uma matriz possui 3 linhas e 4 colunas (ordem 3x4), qual é o seu número total de elementos?",
-        options: ["7", "10", "12", "16"],
-        correct: 2,
-        explanation: "O número total de elementos é obtido multiplicando 3 x 4 = 12."
-      },
-      {
-        id: 7,
-        question: "Como é chamada uma matriz em que todos os seus elementos são iguais a zero?",
-        options: ["Matriz Identidade", "Matriz Nula", "Matriz Diagonal", "Matriz Transposta"],
-        correct: 1,
-        explanation: "Matriz nula é aquela que contém zero em todas as suas posições."
-      },
-      {
-        id: 8,
-        question: "O que é uma matriz diagonal?",
-        options: [
-          "Uma matriz em que todos os elementos são iguais",
-          "Uma matriz quadrada onde todos os elementos fora da diagonal principal são zeros",
-          "Uma matriz com apenas uma linha",
-          "Uma matriz retangular"
-        ],
-        correct: 1,
-        explanation: "Na matriz diagonal, somente os elementos da diagonal principal podem ser não nulos."
-      },
-      {
-        id: 9,
-        question: "Qual é a matriz identidade de ordem 3?",
-        options: [
-          "Uma matriz com todos os elementos iguais a 1",
-          "Uma matriz quadrada com número 1 na diagonal principal e zero nos demais elementos",
-          "Uma matriz nula de ordem 3",
-          "Uma matriz com apenas 3 elementos"
-        ],
-        correct: 1,
-        explanation: "A matriz identidade possui 1s na diagonal principal e 0s no restante."
-      },
-      {
-        id: 10,
-        question: "Qual é a condição obrigatória para podermos somar duas matrizes?",
-        options: [
-          "Elas devem ter exatamente a mesma ordem (mesmo número de linhas e colunas)",
-          "Devem ser matrizes quadradas",
-          "Devem ter ordem diferente",
-          "Devem ser matrizes nulas"
-        ],
-        correct: 0,
-        explanation: "A soma elemento a elemento exige que ambas tenham dimensões idênticas."
-      },
-      {
-        id: 11,
-        question: "Dadas as matrizes A = [ 1, 2 ; 3, 4 ] e B = [ 5, 6 ; 7, 8 ], qual é o resultado da soma A + B?",
-        options: [
-          "[ 6, 8 ; 10, 12 ]",
-          "[ 5, 8 ; 10, 12 ]",
-          "[ 6, 8 ; 9, 12 ]",
-          "[ 6, 7 ; 10, 12 ]"
-        ],
-        correct: 0,
-        explanation: "Somando posição a posição: 1+5=6, 2+6=8, 3+7=10, 4+8=12."
-      },
-      {
-        id: 12,
-        question: "Dada a matriz A = [ 2, -1 ; 3, 4 ], qual é o resultado de multiplicar todos os seus elementos por 3 (matriz 3A)?",
-        options: [
-          "[ 6, -1 ; 3, 4 ]",
-          "[ 6, -3 ; 9, 12 ]",
-          "[ 5, -3 ; 6, 7 ]",
-          "[ 6, -3 ; 3, 4 ]"
-        ],
-        correct: 1,
-        explanation: "Cada número é multiplicado por 3: 2x3=6, -1x3=-3, 3x3=9, 4x3=12."
-      },
-      {
-        id: 13,
-        question: "Qual é o determinante da matriz 2x2 A = [ 2, 3 ; 1, 4 ]? (Dica: diagonal principal menos diagonal secundária)",
-        options: ["5", "8", "11", "14"],
-        correct: 0,
-        explanation: "Det = (2 * 4) - (3 * 1) = 8 - 3 = 5."
-      },
-      {
-        id: 14,
-        question: "Qual é o resultado da multiplicação da matriz linha [ 1, 2 ] pela matriz coluna [ 3 ; 4 ]?",
-        options: ["[ 11 ]", "[ 3, 8 ]", "[ 7 ]", "[ 5 ]"],
-        correct: 0,
-        explanation: "Multiplica-se (1 * 3) + (2 * 4) = 3 + 8 = 11."
-      },
-      {
-        id: 15,
-        question: "Dada a matriz diagonal M = [ 5, 0 ; 0, -2 ], qual é o seu determinante?",
-        options: ["3", "-3", "-10", "10"],
-        correct: 2,
-        explanation: "Nas matrizes diagonais, o determinante é o produto da diagonal principal: 5 * (-2) = -10."
-      },
-      {
-        id: 16,
-        question: "Determine o valor de x para que a matriz [ x, 2 ; 3, 4 ] seja igual à matriz [ 5, 2 ; 3, 4 ].",
-        options: ["x = 2", "x = 3", "x = 4", "x = 5"],
-        correct: 3,
-        explanation: "Pela igualdade de matrizes, o elemento da 1ª linha e 1ª coluna deve ser x = 5."
-      },
-      {
-        id: 17,
-        question: "Qual é a condição para que uma matriz quadrada tenha matriz inversa?",
-        options: [
-          "O seu determinante deve ser igual a zero",
-          "O seu determinante deve ser diferente de zero",
-          "A ordem deve ser ímpar",
-          "Todos os elementos devem ser positivos"
-        ],
-        correct: 1,
-     
+      { id: 1, question: "O que é uma matriz de ordem 2x3?", options: ["2 linhas e 3 colunas", "3 linhas e 2 colunas", "2 linhas e 2 colunas", "3 linhas e 3 colunas"], correct: 0, explanation: "A ordem informa primeiro o número de linhas (2) e depois de colunas (3)." },
+      { id: 2, question: "Dada a matriz A = [ 2, 5 ; -1, 3 ], qual é o elemento da segunda linha e primeira coluna (a21)?", options: ["2", "5", "-1", "3"], correct: 2, explanation: "O elemento a21 fica na 2ª linha e 1ª coluna, que é o -1." },
+      { id: 3, question: "Qual é a matriz A de ordem 2x2 onde cada elemento é a soma da sua linha com sua coluna (a_ij = i + j)?", options: ["[ 1, 2 ; 2, 3 ]", "[ 2, 3 ; 3, 4 ]", "[ 1, 1 ; 2, 2 ]", "[ 2, 2 ; 3, 3 ]"], correct: 1, explanation: "a11=1+1=2, a12=1+2=3, a21=2+1=3 e a22=2+2=4." },
+      { id: 4, question: "O que caracteriza uma matriz quadrada?", options: ["O número de linhas é diferente do de colunas", "O número de linhas é igual ao de colunas", "Todos os elementos são iguais a 1", "Todos os elementos são positivos"], correct: 1, explanation: "Matrizes quadradas possuem o mesmo número de linhas e colunas." },
+      { id: 5, question: "Se uma matriz A tem ordem 2x3, qual será a ordem da sua matriz transposta?", options: ["2x3", "3x2", "2x2", "3x3"], correct: 1, explanation: "A transposição troca linhas por colunas, transformando 2x3 em 3x2." },
+      { id: 6, question: "Se uma matriz possui 3 linhas e 4 colunas (ordem 3x4), qual é o seu número total de elementos?", options: ["7", "10", "12", "16"], correct: 2, explanation: "O número total de elementos é obtido multiplicando 3 x 4 = 12." },
+      { id: 7, question: "Como é chamada uma matriz em que todos os seus elementos são iguais a zero?", options: ["Matriz Identidade", "Matriz Nula", "Matriz Diagonal", "Matriz Transposta"], correct: 1, explanation: "Matriz nula é aquela que contém zero em todas as suas posições." },
+      { id: 8, question: "O que é uma matriz diagonal?", options: ["Uma matriz em que todos os elementos são iguais", "Uma matriz quadrada onde todos os elementos fora da diagonal principal são zeros", "Uma matriz com apenas uma linha", "Uma matriz retangular"], correct: 1, explanation: "Na matriz diagonal, somente os elementos da diagonal principal podem ser não nulos." },
+      { id: 9, question: "Qual é a matriz identidade de ordem 3?", options: ["Uma matriz com todos os elementos iguais a 1", "Uma matriz quadrada com número 1 na diagonal principal e zero nos demais elementos", "Uma matriz nula de ordem 3", "Uma matriz com apenas 3 elementos"], correct: 1, explanation: "A matriz identidade possui 1s na diagonal principal e 0s no restante." },
+      { id: 10, question: "Qual é a condição obrigatória para podermos somar duas matrizes?", options: ["Elas devem ter exatamente a mesma ordem (mesmo número de linhas e colunas)", "Devem ser matrizes quadradas", "Devem ter ordem diferente", "Devem ser matrizes nulas"], correct: 0, explanation: "A soma elemento a elemento exige que ambas tenham dimensões idênticas." },
+      { id: 11, question: "Dadas as matrizes A = [ 1, 2 ; 3, 4 ] e B = [ 5, 6 ; 7, 8 ], qual é o resultado da soma A + B?", options: ["[ 6, 8 ; 10, 12 ]", "[ 5, 8 ; 10, 12 ]", "[ 6, 8 ; 9, 12 ]", "[ 6, 7 ; 10, 12 ]"], correct: 0, explanation: "Somando posição a posição: 1+5=6, 2+6=8, 3+7=10, 4+8=12." },
+      { id: 12, question: "Dada a matriz A = [ 2, -1 ; 3, 4 ], qual é o resultado de multiplicar todos os seus elementos por 3 (matriz 3A)?", options: ["[ 6, -1 ; 3, 4 ]", "[ 6, -3 ; 9, 12 ]", "[ 5, -3 ; 6, 7 ]", "[ 6, -3 ; 3, 4 ]"], correct: 1, explanation: "Cada número é multiplicado por 3: 2x3=6, -1x3=-3, 3x3=9, 4x3=12." },
+      { id: 13, question: "Qual é o determinante da matriz 2x2 A = [ 2, 3 ; 1, 4 ]?", options: ["5", "8", "11", "14"], correct: 0, explanation: "Det = (2 * 4) - (3 * 1) = 8 - 3 = 5." },
+      { id: 14, question: "Qual é o resultado da multiplicação da matriz linha [ 1, 2 ] pela matriz coluna [ 3 ; 4 ]?", options: ["[ 11 ]", "[ 3, 8 ]", "[ 7 ]", "[ 5 ]"], correct: 0, explanation: "Multiplica-se (1 * 3) + (2 * 4) = 3 + 8 = 11." },
+      { id: 15, question: "Dada a matriz diagonal M = [ 5, 0 ; 0, -2 ], qual é o seu determinante?", options: ["3", "-3", "-10", "10"], correct: 2, explanation: "Nas matrizes diagonais, o determinante é o produto da diagonal principal: 5 * (-2) = -10." },
+      { id: 16, question: "Determine o valor de x para que a matriz [ x, 2 ; 3, 4 ] seja igual à matriz [ 5, 2 ; 3, 4 ].", options: ["x = 2", "x = 3", "x = 4", "x = 5"], correct: 3, explanation: "Pela igualdade de matrizes, o elemento da 1ª linha e 1ª coluna deve ser x = 5." },
+      { id: 17, question: "Qual é a condição para que uma matriz quadrada tenha matriz inversa?", options: ["O seu determinante deve ser igual a zero", "O seu determinante deve ser diferente de zero", "A ordem deve ser ímpar", "Todos os elementos devem ser positivos"], correct: 1, explanation: "Apenas matrizes não-singulares (determinante diferente de zero) possuem inversa." },
+      { id: 18, question: "O que define uma matriz simétrica?", options: ["Uma matriz cujo determinante é zero", "Uma matriz que é igual à sua transposta (A = A^t)", "Uma matriz com todos os elementos negativos", "Uma matriz triangular superior"], correct: 1, explanation: "Matrizes simétricas são iguais às suas respectivas matrizes transpostas." },
+      { id: 19, question: "Dadas A = [ 5, 7 ; 2, 4 ] e B = [ 2, 3 ; 1, 1 ], qual é a matriz diferença A - B?", options: ["[ 3, 4 ; 1, 3 ]", "[ 7, 10 ; 3, 5 ]", "[ 3, 3 ; 1, 3 ]", "[ 2, 4 ; 2, 2 ]"], correct: 0, explanation: "Subtraindo elemento a elemento: 5-2=3, 7-3=4, 2-1=1, 4-1=3." },
+      { id: 20, question: "O que é o 'traço' (tr) de uma matriz quadrada?", options: ["A soma de todos os elementos da matriz", "A soma dos elementos da sua diagonal principal", "O determinante da matriz", "O produto de todos os seus elementos"], correct: 1, explanation: "O traço de uma matriz quadrada é a soma dos elementos da diagonal principal." },
+      { id: 21, question: "Dada a matriz identidade I de ordem 2, qual é o resultado de qualquer matriz A(2x2) multiplicada por I (A * I)?", options: ["Matriz Nula", "A própria matriz A", "A matriz transposta de A", "Matriz oposta de A"], correct: 1, explanation: "A matriz identidade funciona como o elemento neutro na multiplicação de matrizes." },
+      { id: 22, question: "O que é a matriz oposta de uma matriz A?", options: ["A matriz transposta A^t", "A matriz inversa A^-1", "A matriz -A, cujos elementos têm sinais trocados", "A matriz identidade"], correct: 2, explanation: "A matriz oposta inverte o sinal de cada elemento da matriz original." },
+      { id: 23, question: "Qual é o determinante de uma matriz triangular de ordem 3?", options: ["A soma dos elementos da diagonal principal", "O produto dos elementos da diagonal principal", "Sempre zero", "Sempre 1"], correct: 1, explanation: "O determinante de qualquer matriz triangular é o produto dos elementos da diagonal principal." },
+      { id: 24, question: "Qual é o resultado da transposta da transposta de uma matriz A ((A^t)^t)?", options: ["A matriz nula", "A matriz oposta -A", "A própria matriz A", "A matriz inversa"], correct: 2, explanation: "Transpor duas vezes retorna exatamente a matriz original." },
+      { id: 25, question: "Se multiplicarmos qualquer matriz A por uma matriz nula de dimensões compatíveis, o resultado é:",options: ["A própria matriz A", "Uma matriz identidade", "Uma matriz nula", "Impossível de calcular"], correct: 2, explanation: "O produto de qualquer matriz por uma matriz nula resulta em uma matriz nula." },
+      { id: 26, question: "A transposta da soma de duas matrizes (A + B)^t é igual a:", options: ["A^t + B^t", "A^t * B^t", "A + B", "Nenhuma das anteriores"], correct: 0, explanation: "A transposição é uma operação linear distributiva sobre a soma." },
+      { id: 27, question: "O que caracteriza uma matriz antissimétrica?", options: ["A^t = A", "A^t = -A", "A * A = I", "Det(A) = 1"], correct: 1, explanation: "Na matriz antissimétrica, a transposta é igual à oposta da matriz (A^t = -A)." },
+      { id: 28, question: "Em uma matriz A de elementos a_ij, o que caracteriza os elementos da diagonal principal?", options: ["O índice da linha é igual ao da coluna (i = j)", "O índice da linha é maior que o da coluna (i > j)", "O índice da linha é menor que o da coluna (i < j)", "A soma dos índices é sempre par"], correct: 0, explanation: "A diagonal principal é formada pelas posições onde a linha e a coluna são iguais (a11, a22, a33...)." },
+      { id: 29, question: "Se multiplicarmos uma matriz A de ordem (mxn) por uma matriz B de ordem (nxp), qual será a ordem da matriz resultante?", options: ["(mxp)", "(nxn)", "(mxn)", "(nxp)"], correct: 0, explanation: "As dimensões internas (n) coincidem, resultando em uma matriz de ordem (mxp)." },
+      { id: 30, question: "Qual é a matriz inversa da matriz identidade I?", options: ["Uma matriz nula", "A própria matriz identidade I", "A matriz oposta -I", "Não possui inversa"], correct: 1, explanation: "A matriz identidade multiplicada por si mesma (ou sua inversa) continua sendo a identidade." }
+    ];
+
+    let gameState = {
+      currentPlayer: 1, // 1 or 2
+      scores: { 1: 0, 2: 0 },
+      answeredQuestions: [],
+      currentQuestionId: null,
+      attemptsLeft: 2,
+      timerSeconds: 45,
+      timerInterval: null
+    };
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderQuestionGrid();
+      updatePlayerUI();
+    });
+
+    function renderQuestionGrid() {
+      const grid = document.getElementById('question-grid');
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= 30; i++) {
+        const isAnswered = gameState.answeredQuestions.includes(i);
+        const btn = document.createElement('button');
+        
+        if (isAnswered) {
+          btn.className = "aspect-square rounded-2xl font-heading text-sm sm:text-base bg-slate-200 text-slate-400 border-2 border-slate-300 cursor-not-allowed flex items-center justify-center shadow-inner";
+          btn.disabled = true;
+          btn.innerHTML = `✓ ${i}`;
+        } else {
+          btn.className = "aspect-square rounded-2xl font-heading text-sm sm:text-base bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white border-2 border-purple-300 shadow-md btn-bounce flex items-center justify-center";
+          btn.innerText = i;
+          btn.onclick = () => openQuizModal(i);
+        }
+        grid.appendChild(btn);
+      }
+    }
+
+    function updatePlayerUI() {
+      document.getElementById('score-p1').innerText = gameState.scores[1];
+      document.getElementById('score-p2').innerText = gameState.scores[2];
+
+      const p1Card = document.getElementById('p1-card');
+      const p2Card = document.getElementById('p2-card');
+      const turnBadge = document.getElementById('turn-badge');
+
+      if (gameState.currentPlayer === 1) {
+        p1Card.style.opacity = '1';
+        p1Card.style.transform = 'scale(1.02)';
+        p2Card.style.opacity = '0.6';
+        p2Card.style.transform = 'scale(1)';
+
+        turnBadge.style.backgroundColor = '#FF6B6B';
+        turnBadge.innerText = 'Vez do Jogador 1 (❌)';
+      } else {
+        p1Card.style.opacity = '0.6';
+        p1Card.style.transform = 'scale(1)';
+        p2Card.style.opacity = '1';
+        p2Card.style.transform = 'scale(1.02)';
+
+        turnBadge.style.backgroundColor = '#4ECDC4';
+        turnBadge.innerText = 'Vez do Jogador 2 (⭕)';
+      }
+    }
+
+    function openQuizModal(questionId) {
+      gameState.currentQuestionId = questionId;
+      gameState.attemptsLeft = 2;
+      gameState.timerSeconds = 45;
+
+      const q = questions.find(item => item.id === questionId);
+      
+      // Header details
+      const playerBadge = document.getElementById('quiz-player-badge');
+      if (gameState.currentPlayer === 1) {
+        playerBadge.style.backgroundColor = '#FF6B6B';
+        playerBadge.innerText = 'Jogador 1 (❌)';
+      } else {
+        playerBadge.style.backgroundColor = '#4ECDC4';
+        playerBadge.innerText = 'Jogador 2 (⭕)';
+      }
+
+      document.getElementById('quiz-title').innerText = `Pergunta #${q.id}`;
+      document.getElementById('quiz-attempts').innerText = `${gameState.attemptsLeft}/2`;
+      document.getElementById('quiz-text').innerText = q.question;
+      
+      // Feedback hidden
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.classList.add('hidden');
+      feedback.className = 'hidden p-3 rounded-2xl font-bold text-center text-sm shadow';
+
+      renderQuizOptions(q);
+
+      document.getElementById('quiz-modal').classList.remove('hidden');
+      startTimer();
+    }
+
+    function renderQuizOptions(q) {
+      const optionsContainer = document.getElementById('quiz-options');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((optText, index) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-3.5 sm:p-4 rounded-2xl bg-white/80 hover:bg-purple-100 text-slate-800 font-bold border-2 border-purple-200 transition-all text-sm sm:text-base btn-bounce flex items-center gap-3";
+        btn.innerHTML = `<span class="bg-purple-200 text-purple-900 font-heading w-7 h-7 rounded-xl flex items-center justify-center shrink-0">${String.fromCharCode(65 + index)}</span> <span>${optText}</span>`;
+        btn.onclick = () => submitAnswer(index);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function startTimer() {
+      clearInterval(gameState.timerInterval);
+      const timerEl = document.getElementById('quiz-timer');
+      const barEl = document.getElementById('timer-bar');
+
+      timerEl.innerText = `${gameState.timerSeconds}s`;
+      barEl.style.width = '100%';
+
+      gameState.timerInterval = setInterval(() => {
+        gameState.timerSeconds--;
+        timerEl.innerText = `${gameState.timerSeconds}s`;
+        const pct = (gameState.timerSeconds / 45) * 100;
+        barEl.style.width = `${pct}%`;
+
+        if (gameState.timerSeconds <= 0) {
+          clearInterval(gameState.timerInterval);
+          handleTimeOut();
+        }
+      }, 1000);
+    }
+
+    function handleTimeOut() {
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.innerText = "⏰ Tempo esgotado!";
+      feedback.className = "p-3 rounded-2xl font-bold text-center text-sm shadow bg-red-100 text-red-700 border-2 border-red-300 block";
+      
+      setTimeout(() => {
+        closeQuizModal();
+        switchPlayer();
+      }, 2000);
+    }
+
+    function submitAnswer(selectedIndex) {
+      clearInterval(gameState.timerInterval);
+      const q = questions.find(item => item.id === gameState.currentQuestionId);
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.classList.remove('hidden');
+
+      if (selectedIndex === q.correct) {
+        // Correct
+        feedback.innerText = `✨ Resposta Correta! ${q.explanation}`;
+        feedback.className = "p-3 rounded-2xl font-bold text-center text-sm shadow bg-emerald-100 text-emerald-800 border-2 border-emerald-300 block";
+        
+        // Add score
+        gameState.scores[gameState.currentPlayer]++;
+        gameState.answeredQuestions.push(q.id);
+
+        triggerConfetti();
+
+        setTimeout(() => {
+          closeQuizModal();
+          document.getElementById('action-modal').classList.remove('hidden');
+        }, 1500);
+
+      } else {
+        // Incorrect
+        gameState.attemptsLeft--;
+        document.getElementById('quiz-attempts').innerText = `${gameState.attemptsLeft}/2`;
+
+        if (gameState.attemptsLeft > 0) {
+          feedback.innerText = `❌ Resposta incorreta! Você tem mais 1 chance. Tente novamente!`;
+          feedback.className = "p-3 rounded-2xl font-bold text-center text-sm shadow bg-amber-100 text-amber-800 border-2 border-amber-300 block";
+          
+          // Restart timer for second chance
+          gameState.timerSeconds = 25;
+          startTimer();
+        } else {
+          feedback.innerText = `❌ Esgotou as chances! A resposta correta era: "${q.options[q.correct]}".`;
+          feedback.className = "p-3 rounded-2xl font-bold text-center text-sm shadow bg-red-100 text-red-800 border-2 border-red-300 block";
+          
+          gameState.answeredQuestions.push(q.id);
+
+          setTimeout(() => {
+            closeQuizModal();
+            renderQuestionGrid();
+            triggerPassDeviceModal();
+          }, 2500);
+        }
+      }
+    }
+
+    function closeQuizModal() {
+      clearInterval(gameState.timerInterval);
+      document.getElementById('quiz-modal').classList.add('hidden');
+    }
+
+    function finishCorrectTurn() {
+      document.getElementById('action-modal').classList.add('hidden');
+      renderQuestionGrid();
+      
+      // Check if all 30 questions are answered
+      if (gameState.answeredQuestions.length >= 30) {
+        triggerSummaryModal();
+      } else {
+        triggerPassDeviceModal();
+      }
+    }
+
+    function triggerPassDeviceModal() {
+      const nextPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+      const avatar = nextPlayer === 1 ? '❌' : '⭕';
+      const name = nextPlayer === 1 ? 'Jogador 1 (Coral)' : 'Jogador 2 (Turquesa)';
+      
+      document.getElementById('pass-avatar').innerText = avatar;
+      document.getElementById('pass-player-name').innerText = name;
+      document.getElementById('pass-modal').classList.remove('hidden');
+    }
+
+    function confirmPassDevice() {
+      switchPlayer();
+      document.getElementById('pass-modal').classList.add('hidden');
+    }
+
+    function switchPlayer() {
+      gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+      updatePlayerUI();
+    }
+
+    function pickRandomQuestion() {
+      const available = [];
+      for (let i = 1; i <= 30; i++) {
+        if (!gameState.answeredQuestions.includes(i)) {
+          available.push(i);
+        }
+      }
+
+      if (available.length === 0) {
+        alert("Todas as perguntas já foram respondidas!");
+        triggerSummaryModal();
+        return;
+      }
+
+      const randomId = available[Math.floor(Math.random() * available.length)];
+      openQuizModal(randomId);
+    }
+
+    function triggerPhysicalVictoryPrompt() {
+      document.getElementById('victory-modal').classList.remove('hidden');
+    }
+
+    function closeVictoryModal() {
+      document.getElementById('victory-modal').classList.add('hidden');
+    }
+
+    function declareWinner(winnerNum) {
+      closeVictoryModal();
+      triggerConfetti();
+
+      const title = winnerNum === 1 ? "🏆 Vitória do Jogador 1 (Coral)!" : "🏆 Vitória do Jogador 2 (Turquesa)!";
+      document.getElementById('summary-title').innerText = title;
+      document.getElementById('summary-subtitle').innerText = "Campeão absoluto no Tabuleiro Físico 3D!";
+      
+      document.getElementById('summary-p1-score').innerText = gameState.scores[1];
+      document.getElementById('summary-p2-score').innerText = gameState.scores[2];
+      document.getElementById('summary-total-questions').innerText = `${gameState.answeredQuestions.length} / 30`;
+
+      document.getElementById('summary-modal').classList.remove('hidden');
+    }
+
+    function triggerSummaryModal() {
+      triggerConfetti();
+      document.getElementById('summary-title').innerText = "Fim de Jogo!";
+      document.getElementById('summary-subtitle').innerText = "Todas as 30 perguntas foram concluídas!";
+
+      document.getElementById('summary-p1-score').innerText = gameState.scores[1];
+      document.getElementById('summary-p2-score').innerText = gameState.scores[2];
+      document.getElementById('summary-total-questions').innerText = `${gameState.answeredQuestions.length} / 30`;
+
+      document.getElementById('summary-modal').classList.remove('hidden');
+    }
+
+    function resetGameModal() {
+      document.getElementById('summary-modal').classList.add('hidden');
+      gameState.currentPlayer = 1;
+      gameState.scores = { 1: 0, 2: 0 };
+      gameState.answeredQuestions = [];
+      updatePlayerUI();
+      renderQuestionGrid();
+    }
+
+    function triggerConfetti() {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
+</body>
+</html>
+
